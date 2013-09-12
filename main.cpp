@@ -17,6 +17,10 @@ int verticesNum;
 int edgesNum;
 vector< vector< pair<int, double> > > comparisionMatrix;
 vector<double> pathWeight;
+vector<int> prev;
+
+void printPath(int dest);
+
 
 struct cmp // the condition of the mound
 {
@@ -40,9 +44,14 @@ void prim_dijkstra(int s) //s starting point
     pathWeight.resize(verticesNum, infty);
     pathWeight[s] = 0;
 
+    prev.clear();
+    prev.resize(verticesNum, infty);
+
+
     kopiec.clear();
     for (int i = 0; i < verticesNum; i++) { //throw vertices, k to the mound
         kopiec.insert(i);
+        prev[i]=-1;
     }
 
     while (!kopiec.empty()) //go to the mound effect
@@ -61,11 +70,13 @@ void prim_dijkstra(int s) //s starting point
                 kopiec.erase(kopiec.find(v));
                 pathWeight[v] = pathWeight[u] + c; // w alg. Prima jest tutaj pathWeight[v] = c ;
                 kopiec.insert(v);
+                prev[v]=u;
                 //	mstClosingVertices[v] = u; // domykam krawędź
             }
           
         }
     }
+
 }
 
 /*
@@ -74,8 +85,10 @@ void prim_dijkstra(int s) //s starting point
 int main(int argc, char** argv) {
     int a, b, s, g;
     double c;
-    FILE *input = fopen("graph.txt", "r+");
+   // FILE *input = fopen("graph.txt", "r+");
+    FILE *input = fopen("test.txt", "r+");
     fscanf(input, "%d %d", &verticesNum, &edgesNum);
+    printf("Vertice Num %d , Edge Num %d",verticesNum,edgesNum);
     comparisionMatrix.resize(verticesNum); // first edge � will turn
 
     bool directed = false;
@@ -97,6 +110,25 @@ int main(int argc, char** argv) {
     printf("The shortest and hottest path-to other vertices, Efforts of %d:\n", s);
     for (int i = 0; i < verticesNum; i++) // specjalnie pomijam wierzhołek nr 0
         printf("to: %d -- [Cost %lf]\n", i, pathWeight[i]);
+
+    printf("\n");
+    	for (int i = 0; i < verticesNum; ++i) {
+    		printf("Path to %d: ", i);
+    		printPath(i);
+    		printf("\n");
+    	}
     return 0;
+}
+
+/*
+ * Prints the shortest path from the source to dest.
+ *
+ * dijkstra(int) MUST be run at least once BEFORE
+ * this is called
+ */
+void printPath(int dest) {
+	if (prev[dest] != -1)
+		printPath(prev[dest]);
+	printf("%d ", dest);
 }
 
