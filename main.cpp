@@ -15,12 +15,12 @@ using namespace std;
 const int infty = 1000000000; // limit
 int verticesNum;
 int edgesNum;
-vector< vector< pair<int, int> > > comparisionMatrix;
-vector<int> pathWeight;
+vector< vector< pair<int, double> > > comparisionMatrix;
+vector<double> pathWeight;
 
-struct cmp // warunek kopca
+struct cmp // the condition of the mound
 {
-    // czy a jest mniejsze od b
+    // if a is smaller than b
 
     bool operator() (const int &a, const int &b) {
         if (pathWeight[a] < pathWeight[b]) return true;
@@ -31,20 +31,21 @@ struct cmp // warunek kopca
 
 set<int, cmp> kopiec; // ;-)
 
-void prim_dijkstra(int s) //s punkt startowy
+void prim_dijkstra(int s) //s starting point
 {
-    int v, u, c;
+    int v, u;
+    double c;
 
     pathWeight.clear();
     pathWeight.resize(verticesNum, infty);
     pathWeight[s] = 0;
 
     kopiec.clear();
-    for (int i = 0; i < verticesNum; i++) { //wrzucam wierzchołki do kopca
+    for (int i = 0; i < verticesNum; i++) { //throw vertices, k to the mound
         kopiec.insert(i);
     }
 
-    while (!kopiec.empty()) //przechodzimy kopiec do skutku
+    while (!kopiec.empty()) //go to the mound effect
     {
         u = *(kopiec.begin()); // weź wierzchołek najbliżej drzewa MST
         kopiec.erase(kopiec.begin());
@@ -71,28 +72,31 @@ void prim_dijkstra(int s) //s punkt startowy
  * 
  */
 int main(int argc, char** argv) {
-    int a, b, c, s, g;
+    int a, b, s, g;
+    double c;
     FILE *input = fopen("graph.txt", "r+");
     fscanf(input, "%d %d", &verticesNum, &edgesNum);
-    comparisionMatrix.resize(verticesNum); // pierwsze krawędzie po kolei
+    comparisionMatrix.resize(verticesNum); // first edge � will turn
 
     bool directed = false;
     fscanf(input, "%d", &directed);
     for (int i = 0; i < edgesNum; i++) {
-        fscanf(input, "%d %d %d", &a, &b, &c); // c = koszt krawędzi od a do b
-        comparisionMatrix[a].push_back(make_pair(b, c)); // skierowany nie skierowany 
+        fscanf(input, "%d %d %lf", &a, &b, &c); // c = Cost edge from a to b
+        printf("input, %d to %d cost %lf\n", a, b, c);
+
+        comparisionMatrix[a].push_back(make_pair(b, c)); // directed not addressed
         if(!directed)
         comparisionMatrix[b].push_back(make_pair(a, c)); //
     }
     
     
     fscanf(input, "%d %d", &s, &g); // sTART gOAL
-    prim_dijkstra(s); // true skierowany false nie skierowany
+    prim_dijkstra(s); // true false targets not addressed
 
-    printf("[DIJKSTRA]\nKoszt minimalnej ścieżki od %d do %d w grafie %s wynosi %d\n", s, g, (directed)?"skierowanym":"nie skierowanym", pathWeight[g]); // index 5 czyli v nr 6
-    printf("Najkrótsze ścieżki do innych wierzchołków od %d:\n", s);
+    printf("[DIJKSTRA]\nThe cost of the minimum path from %d to %d  %s is %lf\n", s, g, (directed)?"directed":"not directed", pathWeight[g]); // index 5 czyli v nr 6
+    printf("The shortest and hottest path-to other vertices, Efforts of %d:\n", s);
     for (int i = 0; i < verticesNum; i++) // specjalnie pomijam wierzhołek nr 0
-        printf("do: %d -- [Koszt %d]\n", i, pathWeight[i]);
+        printf("to: %d -- [Cost %lf]\n", i, pathWeight[i]);
     return 0;
 }
 
